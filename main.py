@@ -1,5 +1,6 @@
 from tkinter import *
 import sqlite3
+import pandas as pd
 
 
 class DATABASE:
@@ -7,6 +8,14 @@ class DATABASE:
         self.FIRSTNAME = ""
         self.LASTNAME = ""
         self.EMAIL = ""
+        self.connection = sqlite3.connect('accounts.db')
+
+    def query(self, query):
+        return pd.read_sql(query, self.connection)
+
+
+db = DATABASE()
+print(db.query('SELECT * FROM accounts'))
 
 
 class Login:
