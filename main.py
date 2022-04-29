@@ -8,10 +8,16 @@ class DATABASE:
         self.FIRSTNAME = ""
         self.LASTNAME = ""
         self.EMAIL = ""
-        self.connection = sqlite3.connect('accounts.db')
+        try:
+            self.connection = sqlite3.connect('accounts.db')
+        except Exception as e:
+            print("Error: Database class could not establish connection with database.")
 
     def query(self, query):
         return pd.read_sql(query, self.connection)
+
+    def addAccount(self, first, last, email, password):
+        pass
 
 
 db = DATABASE()

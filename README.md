@@ -7,7 +7,7 @@ CIS 131 project
 Use pip manager
 
 ```bash
-pip install a
+pip install bcrypt
 ```
 
 ## Useful links
