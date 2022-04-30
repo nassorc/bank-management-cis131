@@ -20,11 +20,22 @@ class DATABASE:
     def addAccount(self, first, last, email, password):
         temp_pass = '123'
         try:
-            res = pd.read_sql(
-                f"INSERT INTO accounts (email, password, first_name, last_name) VALUES('{email}', '{password.decode('ASCII')}', '{first}', '{last}');", self.connection)
-            print(res)
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"INSERT INTO accounts (email, password, first_name, last_name) VALUES('{email}', '{password.decode('ASCII')}', '{first}', '{last}');")
+            # res = pd.read_sql(
+            #     f"INSERT INTO accounts (email, password, first_name, last_name) VALUES('{email}', '{temp_pass}', '{first}', '{last}');", self.connection)
+            # print(res)
         except Exception as e:
             print(f"Error: addAccount did not create new user\n--{e}")
+
+        self.connection.commit()
+
+    def findByEmail(self, email):
+        pass
+
+    def closeDatabase(self):
+        self.connection.close()
 
 
 # db = DATABASE()
