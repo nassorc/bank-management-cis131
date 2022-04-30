@@ -17,15 +17,11 @@ class DATABASE:
     def query(self, query):
         return pd.read_sql(query, self.connection)
 
-    def addAccount(self, first, last, email, password):
-        temp_pass = '123'
+    def add_account(self, first, last, email, password):
         try:
             cursor = self.connection.cursor()
             cursor.execute(
                 f"INSERT INTO accounts (email, password, first_name, last_name) VALUES('{email}', '{password.decode('ASCII')}', '{first}', '{last}');")
-            # res = pd.read_sql(
-            #     f"INSERT INTO accounts (email, password, first_name, last_name) VALUES('{email}', '{temp_pass}', '{first}', '{last}');", self.connection)
-            # print(res)
         except Exception as e:
             print(f"Error: addAccount did not create new user\n--{e}")
 
@@ -130,7 +126,7 @@ class Login:
         hashed = bcrypt.generateHash(password)
         print(len(hashed))
         db = DATABASE()
-        db.addAccount(first, last, email, hashed)
+        db.add_account(first, last, email, hashed)
         print(db.query('SELECT * FROM accounts'))
 
         # hashpasword
