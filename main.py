@@ -69,8 +69,41 @@ class Login:
 
         return
 
-    def handle_register():
-        return
+    def handle_register(self):
+        win = Toplevel(self.login)
+        win.title("Register")
+        # Input fields
+        first_entry = Entry(win, width=32)
+        last_entry = Entry(win, width=32)
+        email_entry = Entry(win, width=32)
+        password_entry = Entry(win, width=32)
+
+        # labels
+        first_label = Label(win, text="First name")
+        last_label = Label(win, text="Last name")
+        email_label = Label(win, text="email")
+        password_label = Label(win, text="password")
+
+        # button
+        register_btn = Button(win, text="create", command=self.create_account)
+
+        # place on register window
+        first_label.grid(row=0, column=0, sticky='w')
+        first_entry.grid(row=0, column=1, sticky=E+W)
+
+        last_label.grid(row=1, column=0, sticky='w')
+        last_entry.grid(row=1, column=1, sticky=E+W)
+
+        email_label.grid(row=2, column=0, sticky='w')
+        email_entry.grid(row=2, column=1, sticky=E+W)
+
+        password_label.grid(row=3, column=0, sticky='w')
+        password_entry.grid(row=3, column=1, sticky=E+W)
+
+        register_btn.grid(row=4, column=0, columnspan=5, sticky=E+W)
+
+    def create_account(self):
+        pass
 
     def mainloop_window(self):
         self.login.mainloop()
