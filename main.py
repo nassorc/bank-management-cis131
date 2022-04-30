@@ -1,6 +1,7 @@
 from tkinter import *
 import sqlite3
 import pandas as pd
+import helpers.hash_password as bcrypt
 
 
 class DATABASE:
@@ -17,11 +18,17 @@ class DATABASE:
         return pd.read_sql(query, self.connection)
 
     def addAccount(self, first, last, email, password):
-        pass
+        temp_pass = '123'
+        try:
+            res = pd.read_sql(
+                f"INSERT INTO accounts (email, password, first_name, last_name) VALUES('{email}', '{password.decode('ASCII')}', '{first}', '{last}');", self.connection)
+            print(res)
+        except Exception as e:
+            print(f"Error: addAccount did not create new user\n--{e}")
 
 
-db = DATABASE()
-print(db.query('SELECT * FROM accounts'))
+# db = DATABASE()
+# print(db.query('SELECT * FROM accounts'))
 
 
 class Login:
@@ -36,7 +43,7 @@ class Login:
         self.login_btn = Button(login, text="Login", width=35,
                                 command=self.handle_login)
         self.register_btn = Button(login, text="open account", width=35,
-                                   command=self.handle_register)
+                                   command=self.register_ui)
 
         # text fields
         # email_text = Text(root, )
@@ -69,41 +76,53 @@ class Login:
 
         return
 
-    def handle_register(self):
+    def register_ui(self):
         win = Toplevel(self.login)
         win.title("Register")
         # Input fields
-        first_entry = Entry(win, width=32)
-        last_entry = Entry(win, width=32)
-        email_entry = Entry(win, width=32)
-        password_entry = Entry(win, width=32)
+        self.first_entry = Entry(win, width=32)
+        self.last_entry = Entry(win, width=32)
+        self.email_entry = Entry(win, width=32)
+        self.password_entry = Entry(win, width=32)
 
         # labels
-        first_label = Label(win, text="First name")
-        last_label = Label(win, text="Last name")
-        email_label = Label(win, text="email")
-        password_label = Label(win, text="password")
+        self.first_label = Label(win, text="First name")
+        self.last_label = Label(win, text="Last name")
+        self.email_label = Label(win, text="email")
+        self.password_label = Label(win, text="password")
 
         # button
-        register_btn = Button(win, text="create", command=self.create_account)
+        self.register_btn = Button(
+            win, text="create", command=self.create_account)
 
         # place on register window
-        first_label.grid(row=0, column=0, sticky='w')
-        first_entry.grid(row=0, column=1, sticky=E+W)
+        self.first_label.grid(row=0, column=0, sticky='w')
+        self.first_entry.grid(row=0, column=1, sticky=E+W)
 
-        last_label.grid(row=1, column=0, sticky='w')
-        last_entry.grid(row=1, column=1, sticky=E+W)
+        self.last_label.grid(row=1, column=0, sticky='w')
+        self.last_entry.grid(row=1, column=1, sticky=E+W)
 
-        email_label.grid(row=2, column=0, sticky='w')
-        email_entry.grid(row=2, column=1, sticky=E+W)
+        self.email_label.grid(row=2, column=0, sticky='w')
+        self.email_entry.grid(row=2, column=1, sticky=E+W)
 
-        password_label.grid(row=3, column=0, sticky='w')
-        password_entry.grid(row=3, column=1, sticky=E+W)
+        self.password_label.grid(row=3, column=0, sticky='w')
+        self.password_entry.grid(row=3, column=1, sticky=E+W)
 
-        register_btn.grid(row=4, column=0, columnspan=5, sticky=E+W)
+        self.register_btn.grid(row=4, column=0, columnspan=5, sticky=E+W)
 
     def create_account(self):
-        pass
+        first = self.first_entry.get()
+        last = self.last_entry.get()
+        email = self.email_entry.get()
+        password = self.password_entry.get()
+
+        hashed = bcrypt.generateHash(password)
+        print(len(hashed))
+        db = DATABASE()
+        db.addAccount(first, last, email, hashed)
+        print(db.query('SELECT * FROM accounts'))
+
+        # hashpasword
 
     def mainloop_window(self):
         self.login.mainloop()

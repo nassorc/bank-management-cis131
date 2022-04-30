@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS accounts;
 CREATE TABLE accounts (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL,
-    password CHAR(3),
+    password CHAR(60),
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     balance INT DEFAULT 0

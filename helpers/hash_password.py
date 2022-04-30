@@ -14,8 +14,12 @@ def validateHash(password, hashPassword):
         print('wrong')
 
 
-res = generateHash('helloworld')
-print(validateHash('helloworld', res))
+def test():
+    print('working')
+
+
+# res = generateHash('helloworld')
+# print(validateHash('helloworld', res))
 
 # password -> hash algo -> new hashed password
 # one way
