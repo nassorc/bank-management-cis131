@@ -47,6 +47,9 @@ class Login:
         login.protocol("WM_DELETE_WINDOW", self.close)
         login.geometry("340x300")
         login.title("Login")
+        # if user logs in return id
+        # variable gives information about the user to the main window
+        self.user_id = 0
 
         self.user_email = Entry(login, width=35)
         self.user_password = Entry(login, width=35)
@@ -83,6 +86,7 @@ class Login:
 
             if bcrypt.validateHash(password, user['password'][0]):
                 print('user logged in')
+                self.user_id = user['id'][0]
                 self.login.destroy()  # removes this window
                 return
             else:
@@ -101,6 +105,7 @@ class Login:
         win = Toplevel(self.login)
         self.win = win
         win.title("Register")
+
         # Input fields
         self.first_entry = Entry(win, width=32)
         self.last_entry = Entry(win, width=32)
@@ -153,18 +158,28 @@ class Login:
         self.login.mainloop()
 
 
-login_page = Login()
-login_page.mainloop_window()
+# login_page = Login()
+# login_page.mainloop_window()
 
 
 class BANK_MANAGEMENT:
     def __init__(self, root=Tk()):
         self.root = root
         root.title("Bank management")
+        root.geometry('600x400')
 
-    def mainloop_root(self):
+        frame1 = Frame(root, width=520, height=200, highlightbackground='red',
+                       highlightthickness=3)
+        frame1.grid(row=0, column=0, padx=20, pady=10, ipadx=20)
+
+        label = Label(frame1, text="window1", font=(16))
+        label.grid(row=0, column=0)
+
+    def mainloop_root(self, user_id):
+        print(f'MAIN WINDOW {user_id}')
         self.root.mainloop()
 
 
 main_win = BANK_MANAGEMENT()
-main_win.mainloop_root()
+main_win.mainloop_root(5)
+# main_win.mainloop_root(login_page.user_id)
