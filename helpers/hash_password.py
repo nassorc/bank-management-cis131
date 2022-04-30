@@ -8,10 +8,10 @@ def generateHash(password):
 
 def validateHash(password, hashPassword):
     b_password = password.encode('ASCII')
-    if bcrypt.checkpw(b_password, hashPassword):
-        print('correct')
-    else:
-        print('wrong')
+    if bcrypt.checkpw(b_password, hashPassword.encode('ASCII')):
+        return True
+
+    return False
 
 
 def test():
@@ -19,7 +19,8 @@ def test():
 
 
 # res = generateHash('helloworld')
-# print(validateHash('helloworld', res))
+# s_res = res.decode('ASCII')
+# print(validateHash('helloworlds', s_res))
 
 # password -> hash algo -> new hashed password
 # one way

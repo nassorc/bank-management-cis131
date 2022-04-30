@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 import sqlite3
 import pandas as pd
 import helpers.hash_password as bcrypt
@@ -24,11 +25,13 @@ class DATABASE:
                 f"INSERT INTO accounts (email, password, first_name, last_name) VALUES('{email}', '{password.decode('ASCII')}', '{first}', '{last}');")
         except Exception as e:
             print(f"Error: addAccount did not create new user\n--{e}")
+            return False
 
         self.connection.commit()
+        return True
 
     def findByEmail(self, email):
-        pass
+        return pd.read_sql(f"SELECT * FROM accounts WHERE email='{email}'", self.connection)
 
     def closeDatabase(self):
         self.connection.close()
@@ -65,26 +68,38 @@ class Login:
         exit()
 
     def handle_login(self):
-        user = ['mat', '123']
         email = self.user_email.get()
         password = self.user_password.get()
 
         if not email or not password:
             msg = Label(
                 self.login, text="Please include an email address and password")
-            msg.grid(row=5, column=2)
+            msg.grid(row=6, column=0)
             return
         try:
-            if email == user[0] and password == user[1]:
+            db = DATABASE()
+            user = db.findByEmail(email)
+            user = user.to_dict()
+
+            if bcrypt.validateHash(password, user['password'][0]):
                 print('user logged in')
                 self.login.destroy()  # removes this window
+                return
+            else:
+                messagebox.showwarning(
+                    title='Invalid input', message='Email or password is incorrect')
+                return
         except Exception as e:
             print(e)
+
+        messagebox.showwarning(
+            title='User', message='User does not exist')
 
         return
 
     def register_ui(self):
         win = Toplevel(self.login)
+        self.win = win
         win.title("Register")
         # Input fields
         self.first_entry = Entry(win, width=32)
@@ -126,10 +141,13 @@ class Login:
         hashed = bcrypt.generateHash(password)
         print(len(hashed))
         db = DATABASE()
-        db.add_account(first, last, email, hashed)
-        print(db.query('SELECT * FROM accounts'))
+        res = db.add_account(first, last, email, hashed)
 
-        # hashpasword
+        if res:
+            messagebox.showinfo(title="User created", message="user created")
+            self.win.destroy()
+        else:
+            messagebox.showwarning(title="Error", message="server error")
 
     def mainloop_window(self):
         self.login.mainloop()
