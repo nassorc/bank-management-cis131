@@ -16,6 +16,8 @@ class Login:
         # variable gives information about the user to the main window
         self.user_id = 0
 
+        self.login_email_label = Label(login, text="email")
+        self.login_password_label = Label(login, text="password")
         self.user_email = Entry(login, width=35)
         self.user_password = Entry(login, width=35)
         self.login_btn = Button(login, text="Login", width=35,
@@ -27,6 +29,8 @@ class Login:
         # email_text = Text(root, )
 
         # add to window
+        self.login_email_label.grid(row=1, column=2, sticky=W)
+        self.login_password_label.grid(row=2, column=2, sticky=W)
         self.user_email.grid(row=1, column=3, columnspan=5, sticky=E+W)
         self.user_password.grid(row=2, column=3, columnspan=5, sticky=E+W)
         self.login_btn.grid(row=3, column=3, columnspan=5, sticky=E+W)
