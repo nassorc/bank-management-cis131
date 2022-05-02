@@ -9,6 +9,8 @@ import database
 class Login:
     def __init__(self, login=Tk()):
         self.login = login
+        # this prevent opening the main window when clicking close without
+        # logging in
         login.protocol("WM_DELETE_WINDOW", self.close)
         login.geometry("340x300")
         login.title("Login")
@@ -19,7 +21,7 @@ class Login:
         self.login_email_label = Label(login, text="email")
         self.login_password_label = Label(login, text="password")
         self.user_email = Entry(login, width=35)
-        self.user_password = Entry(login, width=35)
+        self.user_password = Entry(login, width=35, show="*")
         self.login_btn = Button(login, text="Login", width=35,
                                 command=self.handle_login)
         self.register_btn = Button(login, text="open account", width=35,
@@ -135,11 +137,15 @@ login_page.mainloop_window()
 
 
 class BANK_MANAGEMENT:
-    def __init__(self, root=Tk()):
+    def __init__(self, user_id, root=Tk()):
         self.root = root
         root.title("Bank management")
         root.geometry('600x400')
 
+        self.user_id = user_id
+        db = database.DATABASE()
+        self.user_information = db.findById(self.user_id).to_dict
+        print(f'MAIN WINDOW {self.user_information}')
         frame1 = Frame(root, width=520, height=200, highlightbackground='red',
                        highlightthickness=3)
         frame1.grid(row=0, column=0, padx=20, pady=10, ipadx=20)
@@ -147,11 +153,10 @@ class BANK_MANAGEMENT:
         label = Label(frame1, text="window1", font=(16))
         label.grid(row=0, column=0)
 
-    def mainloop_root(self, user_id):
-        print(f'MAIN WINDOW {user_id}')
+    def mainloop_root(self):
         self.root.mainloop()
 
 
-main_win = BANK_MANAGEMENT()
-main_win.mainloop_root(5)
+main_win = BANK_MANAGEMENT(login_page.user_id)
+main_win.mainloop_root()
 # main_win.mainloop_root(login_page.user_id)
