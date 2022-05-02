@@ -30,6 +30,9 @@ class DATABASE:
     def findByEmail(self, email):
         return pd.read_sql(f"SELECT * FROM accounts WHERE email='{email}'", self.connection)
 
+    def findById(self, id):
+        return pd.read_sql(f"SELECT * FROM accounts WHERE id={id}", self.connection)
+
     def closeDatabase(self):
         self.connection.close()
 
