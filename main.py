@@ -139,10 +139,10 @@ class Login:
         self.login_window.mainloop()
 
 
-login_page = Login()
-db = database.DATABASE()
+# login_page = Login()
+# db = database.DATABASE()
 
-login_page.mainloop_window()
+# login_page.mainloop_window()
 
 
 class BANK_MANAGEMENT:
@@ -155,6 +155,8 @@ class BANK_MANAGEMENT:
         self.user_id = user_id
         db = database.DATABASE()
         self.user = db.findById(self.user_id).to_dict()
+        self.balance = self.user['balance'][0]
+        self.email = self.user['email'][0]
 
         self.frame1 = LabelFrame(root, width=520, height=100, padx=10, pady=10)
         self.frame1.grid(row=0, column=0, columnspan=2,
@@ -164,18 +166,19 @@ class BANK_MANAGEMENT:
         self.logo_label.place(relx=.04, rely=.35)
 
         self.user_email_label = Label(
-            self.frame1, text=f"email: {self.user['email'][0]}")
+            self.frame1, text=f"email: {self.email}")
         self.user_email_label.place(relx=.70, rely=.15)
 
         self.balance_label = Label(
-            self.frame1, text=f"Balance: ${self.user['balance'][0]}")
+            self.frame1, text=f"Balance: ${self.balance}")
         self.balance_label.place(relx=.70, rely=.45)
 
         self.frame2 = Frame(root, width=520, height=60)
         self.frame2.grid(row=1, columnspan=2,
                          padx=20, pady=10, sticky=E+W)
 
-        self.deposit_btn = Button(self.frame2, text="deposit", width=18)
+        self.deposit_btn = Button(
+            self.frame2, text="deposit", width=18, command=self.deposit_ui)
         self.deposit_btn.grid(row=0, column=0, padx=3)
 
         self.withdraw_btn = Button(self.frame2, text="withdraw", width=18)
@@ -187,10 +190,36 @@ class BANK_MANAGEMENT:
         self.activity_btn = Button(self.frame2, text="activity", width=18)
         self.activity_btn.grid(row=0, column=3)
 
+    def deposit_ui(self):
+        self.deposit_window = Toplevel(self.root)
+        self.deposit_window.geometry("410x300")
+        self.deposit_window.title('Deposit')
+
+        ui_frame = Frame(self.deposit_window)
+
+        balance_label = Label(ui_frame,
+                              text=f"${self.balance}", font=(42))
+        amount_label = Label(ui_frame, text="Amount $")
+        self.amount_entry = Entry(ui_frame)
+        button = Button(ui_frame, text="send", command=self.handle_deposit)
+
+        balance_label.grid(row=0, column=0, columnspan=2)
+        amount_label.grid(row=1, column=0, sticky=W)
+        self.amount_entry.grid(row=1, column=1)
+        button.grid(row=2, columnspan=2)
+
+        ui_frame.pack()
+
+    def handle_deposit(self):
+        amount = self.amount_entry.get()
+
+        if not amount:
+            pass
+
     def mainloop_root(self):
         self.root.mainloop()
 
 
-# main_win = BANK_MANAGEMENT(5)
-main_win = BANK_MANAGEMENT(login_page.user_id)
+main_win = BANK_MANAGEMENT(5)
+# main_win = BANK_MANAGEMENT(login_page.user_id)
 main_win.mainloop_root()

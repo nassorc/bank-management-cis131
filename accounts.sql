@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS accounts;
 
 CREATE TABLE accounts (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    email TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
     password CHAR(60),
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
@@ -13,3 +13,5 @@ INSERT INTO accounts (email, password, first_name, last_name, balance)
 VALUES
     ('mat@gmail.com', '123', 'Matthew', 'Crossan', 17),
     ('tam@gmail.com', '123', 'Tam', 'Nassorc', 10);
+
+
