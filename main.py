@@ -2,8 +2,10 @@ from tkinter import *
 from tkinter import messagebox
 import sqlite3
 import pandas as pd
+from sympy import EX
 import helpers.hash_password as bcrypt
 import database
+from decimal import Decimal
 
 
 class Login:
@@ -139,10 +141,10 @@ class Login:
         self.login_window.mainloop()
 
 
-# login_page = Login()
-# db = database.DATABASE()
+login_page = Login()
+db = database.DATABASE()
 
-# login_page.mainloop_window()
+login_page.mainloop_window()
 
 
 class BANK_MANAGEMENT:
@@ -211,10 +213,43 @@ class BANK_MANAGEMENT:
         ui_frame.pack()
 
     def handle_deposit(self):
-        amount = self.amount_entry.get()
+        try:
+            amount = Decimal(self.amount_entry.get())
+        except Exception as e:
+            messagebox.showwarning(title="Amount error",
+                                   message="Please enter a number.")
+            return
 
         if not amount:
-            pass
+            messagebox.showwarning(title="Amount error",
+                                   message="Please enter an amount.")
+            return
+
+        if amount <= 0:
+            messagebox.showwarning(title="Amount error",
+                                   message="Amount must be greater than 0.")
+            return
+
+        db = database.DATABASE()
+        res = db.depositToAccount(self.user_id, amount)
+
+        if res:
+            messagebox.showinfo(title="Success",
+                                message="Amount has been deposited.")
+            self.user = db.findById(self.user_id).to_dict()
+            self.balance = self.user['balance'][0]
+            self.balance_label.config(text=f"Balance: ${self.balance}")
+            return
+
+    def update_user_information(self, id):
+        db = database.DATABASE()
+        self.user = db.findById(self.user_id).to_dict()
+        self.balance = self.user['balance'][0]
+
+    def refresh(self):
+        # update window to display latest version of information
+        self.destroy()
+        self.__init__(5)
 
     def mainloop_root(self):
         self.root.mainloop()
