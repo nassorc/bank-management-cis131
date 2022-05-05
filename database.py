@@ -33,6 +33,18 @@ class DATABASE:
     def findById(self, id):
         return pd.read_sql(f"SELECT * FROM accounts WHERE id={id}", self.connection)
 
+    def depositToAccount(self, id, amount):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(f"""UPDATE accounts SET balance = balance + {int(amount)}
+                                WHERE id = {id};""")
+        except Exception as e:
+            print(f"Error: depositToAccount failed.\n--{e}")
+            return False
+
+        self.connection.commit()
+        return True
+
     def closeDatabase(self):
         self.connection.close()
 
