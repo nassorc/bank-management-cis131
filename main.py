@@ -1,13 +1,12 @@
 from tkinter import *
 from tkinter import messagebox
 from sympy import EX
-import helpers.hash_password as bcrypt
 import database
 from decimal import Decimal
 from authentication_gui_and_program import *
 
-login_page = Login()
-login_page.mainloop_window()
+# login_page = Login()
+# login_page.mainloop_window()
 
 
 class BANK_MANAGEMENT:
@@ -54,6 +53,9 @@ class BANK_MANAGEMENT:
 
         self.activity_btn = Button(self.frame2, text="activity", width=18)
         self.activity_btn.grid(row=0, column=3)
+
+        self.frame3 = Frame(root, width=520)
+        self.frame.grid(row=2, columnspan=2)
 
     def deposit_ui(self):
         self.deposit_window = Toplevel(self.root)

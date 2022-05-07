@@ -49,5 +49,7 @@ class DATABASE:
         self.connection.close()
 
 
-# db = DATABASE()
-# print(db.query('SELECT * FROM accounts'))
+db = DATABASE()
+# db.add_account('matty', 'cross', 'matty@gmail.com', '321'.encode('ASCII'))
+# print(db.query('SELECT * FROM transactions INNER JOIN accounts as a ON transactions.account_id=a.id'))
+print(db.query("""SELECT * FROM transfers"""))

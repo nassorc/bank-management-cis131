@@ -10,6 +10,10 @@ Use pip manager
 pip install bcrypt
 ```
 
+## bugs
+
+- declare login class above main system class. Causes a bug.
+
 ## Useful links
 
 https://stackoverflow.com/questions/58432120/how-to-open-main-window-after-successful-login
