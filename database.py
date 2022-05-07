@@ -15,6 +15,19 @@ class DATABASE:
     def query(self, query):
         return pd.read_sql(query, self.connection)
 
+    def add_transaction_record(self, id, amount):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"INSERT INTO transactions (account_id, amount) VALUES('{id}', {amount});")
+        except Exception as e:
+            print(
+                f"Error: add_transaction_record failed to insert new recrod.\n--{e}")
+            return False
+
+        self.connection.commit()
+        return True
+
     def add_account(self, first, last, email, password):
         try:
             cursor = self.connection.cursor()
@@ -49,7 +62,7 @@ class DATABASE:
         self.connection.close()
 
 
-db = DATABASE()
+# db = DATABASE()
 # db.add_account('matty', 'cross', 'matty@gmail.com', '321'.encode('ASCII'))
 # print(db.query('SELECT * FROM transactions INNER JOIN accounts as a ON transactions.account_id=a.id'))
-print(db.query("""SELECT * FROM transfers"""))
+# print(db.query("""SELECT * FROM transfers"""))

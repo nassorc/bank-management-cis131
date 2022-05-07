@@ -54,8 +54,19 @@ class BANK_MANAGEMENT:
         self.activity_btn = Button(self.frame2, text="activity", width=18)
         self.activity_btn.grid(row=0, column=3)
 
-        self.frame3 = Frame(root, width=520)
-        self.frame.grid(row=2, columnspan=2)
+        self.frame3 = LabelFrame(root, width=520, height=60, padx=10, pady=10)
+        self.frame3_container = Scrollbar(self.frame3, orient='vertical')
+        self.frame3_container.pack(side=RIGHT)
+        label = Label(self.frame3_container, text="hello").pack()
+        label = Label(self.frame3_container, text="hello").pack()
+        label = Label(self.frame3_container, text="hello").pack()
+        label = Label(self.frame3_container, text="hello").pack()
+
+        self.frame3.grid(row=2, column=0, columnspan=2,
+                         padx=20, pady=10, ipadx=20, sticky=E+W)
+
+    def frame3_components(self):
+        pass
 
     def deposit_ui(self):
         self.deposit_window = Toplevel(self.root)
@@ -97,13 +108,15 @@ class BANK_MANAGEMENT:
 
         db = database.DATABASE()
         res = db.depositToAccount(self.user_id, amount)
-
+        db.add_transaction_record(self.user_id, amount)
+        print(db.query('SELECT * FROM transactions'))
         if res:
             messagebox.showinfo(title="Success",
                                 message="Amount has been deposited.")
             self.user = db.findById(self.user_id).to_dict()
             self.balance = self.user['balance'][0]
             self.balance_label.config(text=f"Balance: ${self.balance}")
+            self.deposit_window.destroy()
             return
 
     def update_user_information(self, id):
@@ -115,6 +128,6 @@ class BANK_MANAGEMENT:
         self.root.mainloop()
 
 
-main_win = BANK_MANAGEMENT(5)
+main_win = BANK_MANAGEMENT(1002)
 # main_win = BANK_MANAGEMENT(login_page.user_id)
 main_win.mainloop_root()
