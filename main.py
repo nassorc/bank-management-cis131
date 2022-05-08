@@ -45,7 +45,8 @@ class BANK_MANAGEMENT:
             self.frame2, text="deposit", width=18, command=self.deposit_ui)
         self.deposit_btn.grid(row=0, column=0, padx=3)
 
-        self.withdraw_btn = Button(self.frame2, text="withdraw", width=18)
+        self.withdraw_btn = Button(
+            self.frame2, text="withdraw", width=18, command=self.withdraw_ui)
         self.withdraw_btn.grid(row=0, column=1)
 
         self.transfer_btn = Button(self.frame2, text="transfer", width=18)
@@ -87,6 +88,50 @@ class BANK_MANAGEMENT:
         button.grid(row=2, columnspan=2)
 
         ui_frame.pack()
+
+    def withdraw_ui(self):
+        self.withdraw_window = Toplevel(self.root)
+        self.withdraw_window.geometry("410x300")
+        self.withdraw_window.title('Withdraw')
+
+        ui_frame = Frame(self.withdraw_window)
+
+        balance_label = Label(ui_frame,
+                              text=f"${self.balance}", font=(42))
+        amount_label = Label(ui_frame, text="Amount $")
+        self.amount_entry = Entry(ui_frame)
+        button = Button(ui_frame, text="send", command=self.handle_withdrawal)
+
+        balance_label.grid(row=0, column=0, columnspan=2)
+        amount_label.grid(row=1, column=0, sticky=W)
+        self.amount_entry.grid(row=1, column=1)
+        button.grid(row=2, columnspan=2)
+
+        ui_frame.pack()
+
+    def handle_withdrawal(self):
+        try:
+            amount = Decimal(f"-{self.amount_entry.get()}")
+        except Exception as e:
+            messagebox.showwarning(title="Amount error",
+                                   message="Please enter a number.")
+            return
+        if not amount:
+            messagebox.showwarning(title="Amount error",
+                                   message="Please enter an amount.")
+            return
+        db = database.DATABASE()
+        res = db.depositToAccount(self.user_id, amount)
+        db.add_transaction_record(self.user_id, amount)
+        print(db.query('SELECT * FROM transactions'))
+        if res:
+            messagebox.showinfo(title="Success",
+                                message="Amount has been deposited.")
+            self.user = db.findById(self.user_id).to_dict()
+            self.balance = self.user['balance'][0]
+            self.balance_label.config(text=f"Balance: ${self.balance}")
+            self.deposit_window.destroy()
+            return
 
     def handle_deposit(self):
         try:
