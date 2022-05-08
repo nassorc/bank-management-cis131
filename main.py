@@ -5,8 +5,8 @@ import database
 from decimal import Decimal
 from authentication_gui_and_program import *
 
-# login_page = Login()
-# login_page.mainloop_window()
+login_page = Login()
+login_page.mainloop_window()
 
 
 class BANK_MANAGEMENT:
@@ -173,6 +173,6 @@ class BANK_MANAGEMENT:
         self.root.mainloop()
 
 
-main_win = BANK_MANAGEMENT(1002)
-# main_win = BANK_MANAGEMENT(login_page.user_id)
+# main_win = BANK_MANAGEMENT(1002)
+main_win = BANK_MANAGEMENT(login_page.user_id)
 main_win.mainloop_root()
