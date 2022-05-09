@@ -11,15 +11,15 @@ from decimal import Decimal
 class Login:
     def __init__(self, login_window=Tk()):
         self.login_window = login_window
-        # this prevent opening the main window when clicking close without
-        # logging in
+        # this prevents opening the main window when clicking exit button of the authentication ui
         login_window.protocol("WM_DELETE_WINDOW", self.close)
         login_window.geometry("410x300")
         login_window.title("Login")
-        # if user logs in return id
-        # variable gives information about the user to the main window
-        self.user_id = 0
 
+        # user_id gives the main system information about the user
+        self.user_id
+
+        # create tkinter widgets
         self.login_frame = Frame(
             login_window, width=340, height=300, padx=20)
 
@@ -33,9 +33,6 @@ class Login:
                                 command=self.handle_login)
         self.register_btn = Button(self.login_frame, text="open account", width=35,
                                    command=self.register_ui)
-
-        # text fields
-        # email_text = Text(root, )
 
         # add to window
         self.login_logo.grid(row=0, column=2)
@@ -52,13 +49,11 @@ class Login:
         exit()
 
     def handle_login(self):
+        # get data from input field
         email = self.user_email.get()
         password = self.user_password.get()
 
         if not email or not password:
-            # msg = Label(
-            #     self.login_window, text="Please include an email address and password")
-            # msg.place()
             messagebox.showwarning(
                 title="incomplete", message='Please include an email and password')
             return
@@ -80,7 +75,7 @@ class Login:
             print(e)
 
         messagebox.showwarning(
-            title='User', message='User does not exist')
+            title='User', message='Email or password is incorrect')
 
         return
 

@@ -14,10 +14,6 @@ def validateHash(password, hashPassword):
     return False
 
 
-def test():
-    print('working')
-
-
 # res = generateHash('helloworld')
 # s_res = res.decode('ASCII')
 # print(validateHash('helloworlds', s_res))

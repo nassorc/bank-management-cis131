@@ -4,9 +4,6 @@ import pandas as pd
 
 class DATABASE:
     def __init__(self):
-        self.FIRSTNAME = ""
-        self.LASTNAME = ""
-        self.EMAIL = ""
         try:
             self.connection = sqlite3.connect('accounts.db')
         except Exception as e:
