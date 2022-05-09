@@ -17,7 +17,7 @@ class Login:
         login_window.title("Login")
 
         # user_id gives the main system information about the user
-        self.user_id
+        self.user_id = 0
 
         # create tkinter widgets
         self.login_frame = Frame(

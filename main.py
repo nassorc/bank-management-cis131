@@ -203,6 +203,7 @@ main_win = BANK_MANAGEMENT(login_page.user_id)
 main_win.mainloop_root()
 
 
+# create a row for each record - transaction UI
 # label -> anchor=W, relief=SUNKEN
 
 # for entry in all transactions
