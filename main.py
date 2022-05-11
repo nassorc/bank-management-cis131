@@ -1,12 +1,13 @@
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
 from sympy import EX
 import database
 from decimal import Decimal
 from authentication_gui_and_program import *
 
-login_page = Login()
-login_page.mainloop_window()
+# login_page = Login()
+# login_page.mainloop_window()
 
 
 class BANK_MANAGEMENT:
@@ -20,7 +21,7 @@ class BANK_MANAGEMENT:
         # initialize tk widgets
         self.root = root
         root.title("Bank management")
-        root.geometry('600x400')
+        root.geometry('600x600')
 
         # get user information from database
         self.user_id = user_id
@@ -30,54 +31,64 @@ class BANK_MANAGEMENT:
         self.email = self.user['email'][0]
 
         # frame1 components
-        self.frame1 = LabelFrame(root, width=520, height=100, padx=10, pady=10)
-        self.frame1.grid(row=0, column=0, columnspan=2,
-                         padx=20, pady=10, ipadx=20, sticky=E+W)
+        frame1 = LabelFrame(root, width=520, height=100, padx=10, pady=10)
+        frame1.grid(row=0, column=0, columnspan=2,
+                    padx=20, pady=10, ipadx=20, sticky=E+W)
 
-        self.logo_label = Label(self.frame1, text="Bank Management", font=(48))
-        self.logo_label.place(relx=.04, rely=.35)
+        logo_label = Label(frame1, text="Bank Management", font=(48))
+        logo_label.place(relx=.04, rely=.35)
 
         self.user_email_label = Label(
-            self.frame1, text=f"email: {self.email}")
+            frame1, text=f"email: {self.email}")
         self.user_email_label.place(relx=.70, rely=.15)
 
         self.balance_label = Label(
-            self.frame1, text=f"Balance: ${self.balance}")
+            frame1, text=f"Balance: ${self.balance}")
         self.balance_label.place(relx=.70, rely=.45)
 
         # frame2 components
-        self.frame2 = Frame(root, width=520, height=60)
-        self.frame2.grid(row=1, columnspan=2,
-                         padx=20, pady=10, sticky=E+W)
+        frame2 = Frame(root, width=520, height=60)
+        frame2.grid(row=1, columnspan=2,
+                    padx=20, pady=10, sticky=E+W)
 
-        self.deposit_btn = Button(
-            self.frame2, text="deposit", width=18, command=self.deposit_ui)
-        self.deposit_btn.grid(row=0, column=0, padx=3)
+        deposit_btn = Button(
+            frame2, text="deposit", width=18, command=self.deposit_ui)
+        deposit_btn.grid(row=0, column=0, padx=3)
 
-        self.withdraw_btn = Button(
-            self.frame2, text="withdraw", width=18, command=self.withdraw_ui)
-        self.withdraw_btn.grid(row=0, column=1)
+        withdraw_btn = Button(
+            frame2, text="withdraw", width=18, command=self.withdraw_ui)
+        withdraw_btn.grid(row=0, column=1)
 
-        self.transfer_btn = Button(self.frame2, text="transfer", width=18)
-        self.transfer_btn.grid(row=0, column=2)
+        transfer_btn = Button(frame2, text="transfer",
+                              width=18, command=self.transfer_ui)
+        transfer_btn.grid(row=0, column=2)
 
-        self.activity_btn = Button(self.frame2, text="activity", width=18)
-        self.activity_btn.grid(row=0, column=3)
+        activity_btn = Button(frame2, text="activity", width=18)
+        activity_btn.grid(row=0, column=3)
 
-        # frame3 components
-        self.frame3 = LabelFrame(root, width=520, height=60, padx=10, pady=10)
-        self.frame3_container = Scrollbar(self.frame3, orient='vertical')
-        self.frame3_container.pack(side=RIGHT)
-        label = Label(self.frame3_container, text="hello").pack()
-        label = Label(self.frame3_container, text="hello").pack()
-        label = Label(self.frame3_container, text="hello").pack()
-        label = Label(self.frame3_container, text="hello").pack()
+        # fill="both", expand="yes"
+        self.frame3 = Frame(root, width=520, height=40, padx=10, pady=10)
+        frame3_canvas = Canvas(self.frame3)
+        frame3_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
-        self.frame3.grid(row=2, column=0, columnspan=2,
-                         padx=20, pady=10, ipadx=20, sticky=E+W)
+        scrolly = Scrollbar(self.frame3, orient=VERTICAL,
+                            command=frame3_canvas.yview)
+        scrolly.pack(side=RIGHT, fill=Y)
 
-    def frame3_components(self):
-        pass
+        frame3_canvas.configure(yscrollcommand=scrolly.set)
+
+        frame3_innerframe = Frame(self.frame3)
+        frame3_canvas.create_window(
+            (0, 0), window=frame3_innerframe, anchor="nw")
+
+        frame3_canvas.bind('<Configure>', lambda e: frame3_canvas.configure(
+            scrollregion=frame3_canvas.bbox('all')))
+
+        for i in range(20):
+            l = Label(frame3_canvas, text="hello")
+            l.pack()
+
+        self.frame3.grid(row=2)
 
     def deposit_ui(self):
         # this function creates a top level tk window and prompts user to desposit
@@ -93,7 +104,7 @@ class BANK_MANAGEMENT:
                               text=f"${self.balance}", font=(42))
         amount_label = Label(ui_frame, text="Amount $")
         self.amount_entry = Entry(ui_frame)
-        button = Button(ui_frame, text="send", command=self.handle_deposit)
+        button = Button(ui_frame, text="send", command=self.make_deposit)
 
         # display in frame
         balance_label.grid(row=0, column=0, columnspan=2)
@@ -114,33 +125,100 @@ class BANK_MANAGEMENT:
         self.withdraw_window.title('Withdraw')
 
         # holds all widgets
-        ui_frame = Frame(self.withdraw_window)
+        # justify widgets center
+        widget_container = Frame(self.withdraw_window)
 
-        balance_label = Label(ui_frame,
+        balance_label = Label(widget_container,
                               text=f"${self.balance}", font=(42))
-        amount_label = Label(ui_frame, text="Amount $")
-        self.amount_entry = Entry(ui_frame)
-        button = Button(ui_frame, text="send", command=self.handle_withdrawal)
+        amount_label = Label(widget_container, text="Amount $")
+        self.amount_entry = Entry(widget_container)
+        button = Button(widget_container, text="send",
+                        command=self.make_withdrawal)
 
         balance_label.grid(row=0, column=0, columnspan=2)
         amount_label.grid(row=1, column=0, sticky=W)
         self.amount_entry.grid(row=1, column=1)
         button.grid(row=2, columnspan=2)
 
-        ui_frame.pack()
+        widget_container.pack()
 
-    def handle_withdrawal(self):
+    def transfer_ui(self):
+        self.transfer_window = Toplevel(self.root)
+        self.transfer_window.geometry("410x300")
+        self.transfer_window.title('Transfer money')
+
+        widget_container = Frame(self.transfer_window)
+
+        # labels
+        header_label = Label(widget_container, text="Transfer money")
+        from_label = Label(widget_container, text="From: ")
+        from_label_user = Label(
+            widget_container, text=f"{self.email}", relief=SUNKEN)
+        to_label = Label(widget_container, text="To: ")
+
+        # entry
+        self.amount = Entry(widget_container)
+        self.transfer_to_email = Entry(widget_container)
+
+        # button
+        transfer_button = Button(
+            widget_container, text="Transfer", command=self.make_transfer)
+
+        # place on screen
+        header_label.grid(row=0, column=0, columnspan=2)
+        self.amount.grid(row=1, column=0, columnspan=2)
+        from_label.grid(row=2, column=0, columnspan=2)
+        from_label_user.grid(row=2, column=1, columnspan=2)
+        to_label.grid(row=3, column=0, columnspan=2)
+        self.transfer_to_email.grid(row=3, column=1, columnspan=2)
+        transfer_button.grid(row=4, column=0, columnspan=2)
+
+        widget_container.pack()
+
+    def make_transfer(self):
+        if not self.amount.get():
+            messagebox.showwarning(title="Amount error",
+                                   message="Input cannot be empty")
+            return
+        try:
+            amount = Decimal(f"{self.amount.get()}")
+        except Exception as e:
+            messagebox.showwarning(title="Amount error",
+                                   message="Please enter a number.")
+            return
+
+        # connect to db
+        db = database.DATABASE()
+        user = db.findByEmail(self.transfer_to_email.get())
+
+        if len(user) <= 0:
+            messagebox.showwarning(title="email error",
+                                   message="User does not exist.")
+            return
+
+        receiver_id = user.to_dict()['id'][0]
+        res = db.depositToAccount(receiver_id, amount)
+        if res:
+            db.add_transfer_record(receiver_id, self.user_id, amount)
+            messagebox.showinfo(title="Success",
+                                message="The money has been sent")
+            self.transfer_window.destroy()
+            return
+
+        # check if account exists
+
+    def make_withdrawal(self):
         # this function validates the amount to be taken out of the
         # users account, and pushes the changes to the database.
+        if not self.amount_entry.get():
+            messagebox.showwarning(title="Amount error",
+                                   message="Input cannot be empty")
+            return
         try:
             amount = Decimal(f"-{self.amount_entry.get()}")
         except Exception as e:
             messagebox.showwarning(title="Amount error",
                                    message="Please enter a number.")
-            return
-        if not amount:
-            messagebox.showwarning(title="Amount error",
-                                   message="Please enter an amount.")
             return
 
         # connect to database
@@ -151,14 +229,22 @@ class BANK_MANAGEMENT:
         # check if data is saved to the database
         if res:
             messagebox.showinfo(title="Success",
-                                message="Amount has been deposited.")
+                                message="Amount has been withdrawn.")
             self.user = db.findById(self.user_id).to_dict()
             self.balance = self.user['balance'][0]
             self.balance_label.config(text=f"Balance: ${self.balance}")
-            self.deposit_window.destroy()
+            self.withdraw_window.destroy()
             return
 
-    def handle_deposit(self):
+    def make_deposit(self):
+        if not self.amount_entry.get():
+            messagebox.showwarning(title="Amount error",
+                                   message="Input cannot be empty")
+            return
+        if self.amount_entry.get() <= 0:
+            messagebox.showwarning(title="Amount error",
+                                   message="Amount must be greater than 0.")
+            return
         try:
             amount = Decimal(self.amount_entry.get())
         except Exception as e:
@@ -166,21 +252,10 @@ class BANK_MANAGEMENT:
                                    message="Please enter a number.")
             return
 
-        if not amount:
-            messagebox.showwarning(title="Amount error",
-                                   message="Please enter an amount.")
-            return
-
-        if amount <= 0:
-            messagebox.showwarning(title="Amount error",
-                                   message="Amount must be greater than 0.")
-            return
-
         db = database.DATABASE()
         res = db.depositToAccount(self.user_id, amount)
-        db.add_transaction_record(self.user_id, amount)
-        print(db.query('SELECT * FROM transactions'))
         if res:
+            db.add_transaction_record(self.user_id, amount)
             messagebox.showinfo(title="Success",
                                 message="Amount has been deposited.")
             self.user = db.findById(self.user_id).to_dict()
@@ -189,17 +264,12 @@ class BANK_MANAGEMENT:
             self.deposit_window.destroy()
             return
 
-    def update_user_information(self, id):
-        db = database.DATABASE()
-        self.user = db.findById(self.user_id).to_dict()
-        self.balance = self.user['balance'][0]
-
     def mainloop_root(self):
         self.root.mainloop()
 
 
-# main_win = BANK_MANAGEMENT(1002)
-main_win = BANK_MANAGEMENT(login_page.user_id)
+main_win = BANK_MANAGEMENT(1002)
+# main_win = BANK_MANAGEMENT(login_page.user_id)
 main_win.mainloop_root()
 
 

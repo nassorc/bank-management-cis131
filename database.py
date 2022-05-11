@@ -33,6 +33,19 @@ class DATABASE:
         self.connection.commit()
         return True
 
+    def add_transfer_record(self, receiver, sender, amount):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                f"INSERT INTO transfers (from_account, to_account, amount) VALUES({receiver},{sender},{amount});")
+        except Exception as e:
+            print(
+                f"Error: add_transfer_record failed to insert new record.\n--{e}")
+            return False
+
+        self.connection.commit()
+        return True
+
     def add_account(self, first, last, email, password):
         # function creates and inserts a new user into the database
         try:
@@ -49,7 +62,7 @@ class DATABASE:
 
     def findByEmail(self, email):
         # finds a user given an email
-        return pd.read_sql(f"SELECT * FROM accounts WHERE email='{email}'", self.connection)
+        return pd.read_sql(f"SELECT * FROM accounts WHERE email='{email}';", self.connection)
 
     def findById(self, id):
         # finds a user given an id
@@ -74,6 +87,7 @@ class DATABASE:
 
 
 # db = DATABASE()
+# print(db.query('SELECT * FROM accounts'))
 # db.add_account('matty', 'cross', 'matty@gmail.com', '321'.encode('ASCII'))
 # print(db.query('SELECT * FROM transactions INNER JOIN accounts as a ON transactions.account_id=a.id'))
 # print(db.query("""SELECT * FROM transfers"""))

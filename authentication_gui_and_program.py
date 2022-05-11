@@ -1,11 +1,8 @@
 from tkinter import *
 from tkinter import messagebox
-import sqlite3
-import pandas as pd
 from sympy import EX
 import helpers.hash_password as bcrypt
 import database
-from decimal import Decimal
 
 
 class Login:
@@ -20,30 +17,35 @@ class Login:
         self.user_id = 0
 
         # create tkinter widgets
-        self.login_frame = Frame(
+        # labels
+        login_frame = Frame(
             login_window, width=340, height=300, padx=20)
 
-        self.login_logo = Label(
-            self.login_frame, text="Bank Manager", font=48, pady=15)
-        self.login_email_label = Label(self.login_frame, text="email")
-        self.login_password_label = Label(self.login_frame, text="password")
-        self.user_email = Entry(self.login_frame, width=35)
-        self.user_password = Entry(self.login_frame, width=35, show="*")
-        self.login_btn = Button(self.login_frame, text="Login", width=35,
-                                command=self.handle_login)
-        self.register_btn = Button(self.login_frame, text="open account", width=35,
-                                   command=self.register_ui)
+        login_logo = Label(
+            login_frame, text="Bank Manager", font=48, pady=15)
+        login_email_label = Label(login_frame, text="email")
+        login_password_label = Label(login_frame, text="password")
+
+        # input fields
+        self.user_email = Entry(login_frame, width=35)
+        self.user_password = Entry(login_frame, width=35, show="*")
+
+        # buttons
+        login_btn = Button(login_frame, text="Login", width=35,
+                           command=self.handle_login)
+        register_btn = Button(login_frame, text="open account", width=35,
+                              command=self.register_ui)
 
         # add to window
-        self.login_logo.grid(row=0, column=2)
-        self.login_email_label.grid(row=1, column=2, sticky=W)
-        self.login_password_label.grid(row=2, column=2, sticky=W)
+        login_logo.grid(row=0, column=2)
+        login_email_label.grid(row=1, column=2, sticky=W)
+        login_password_label.grid(row=2, column=2, sticky=W)
         self.user_email.grid(row=1, column=3, columnspan=5, sticky=E+W)
         self.user_password.grid(row=2, column=3, columnspan=5, sticky=E+W)
-        self.login_btn.grid(row=3, column=3, columnspan=5, sticky=E+W)
-        self.register_btn.grid(row=4, column=3, columnspan=5)
+        login_btn.grid(row=3, column=3, columnspan=5, sticky=E+W)
+        register_btn.grid(row=4, column=3, columnspan=5)
 
-        self.login_frame.pack()
+        login_frame.pack()
 
     def close(self):
         exit()
@@ -91,29 +93,29 @@ class Login:
         self.password_entry = Entry(register_window, width=32)
 
         # labels
-        self.first_label = Label(register_window, text="First name")
-        self.last_label = Label(register_window, text="Last name")
-        self.email_label = Label(register_window, text="email")
-        self.password_label = Label(register_window, text="password")
+        first_label = Label(register_window, text="First name")
+        last_label = Label(register_window, text="Last name")
+        email_label = Label(register_window, text="email")
+        password_label = Label(register_window, text="password")
 
         # button
-        self.register_btn = Button(
+        register_btn = Button(
             register_window, text="create", command=self.create_account)
 
         # place on register window
-        self.first_label.grid(row=0, column=0, sticky='w')
+        first_label.grid(row=0, column=0, sticky='w')
         self.first_entry.grid(row=0, column=1, sticky=E+W)
 
-        self.last_label.grid(row=1, column=0, sticky='w')
+        last_label.grid(row=1, column=0, sticky='w')
         self.last_entry.grid(row=1, column=1, sticky=E+W)
 
-        self.email_label.grid(row=2, column=0, sticky='w')
+        email_label.grid(row=2, column=0, sticky='w')
         self.email_entry.grid(row=2, column=1, sticky=E+W)
 
-        self.password_label.grid(row=3, column=0, sticky='w')
+        password_label.grid(row=3, column=0, sticky='w')
         self.password_entry.grid(row=3, column=1, sticky=E+W)
 
-        self.register_btn.grid(row=4, column=0, columnspan=5, sticky=E+W)
+        register_btn.grid(row=4, column=0, columnspan=5, sticky=E+W)
 
     def create_account(self):
         first = self.first_entry.get()
