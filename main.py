@@ -8,8 +8,8 @@ import pandas as pd
 from authentication_gui_and_program import *
 import datetime
 
-# login_page = Login()
-# login_page.mainloop_window()
+login_page = Login()
+login_page.mainloop_window()
 
 
 class BANK_MANAGEMENT:
@@ -70,20 +70,21 @@ class BANK_MANAGEMENT:
         activity_btn.grid(row=0, column=3)
 
         self.frame3 = Frame(root, width=520, height=40, padx=10, pady=10)
+        self.create_record_ui()
+        self.frame3.grid(row=2)
+
+    def create_record_ui(self):
+        self.record_frame = Frame(self.frame3)
+        db = database.DATABASE()
         all_transactions = db.query(f"""SELECT account_id, amount, dt from transactions
                                         WHERE account_id = {self.user_id} ORDER BY dt DESC""").to_dict()
-        all_transfers = db.query(
-            f"""SELECT from_account, to_account, dt, amount as transfer_amount FROM transfers
-                WHERE from_account = {self.user_id} ORDER BY dt DESC""").to_dict()
-        # history = {**all_transactions, **all_transfers}
-        # print(history)
         date_exists = {}
         for i in range(len(all_transactions['account_id'])):
             amount = all_transactions['amount'][i]
             date = all_transactions['dt'][i].split()[0]
-            amount_label = Label(self.frame3, text=f"Deposit: ${amount}") if \
-                (amount >= 0) else Label(self.frame3, text=f"Withdrawal: ${abs(amount)}")
-            date_label = Label(self.frame3, text=f"{date}", bg='grey')
+            amount_label = Label(self.record_frame, text=f"Deposit: ${amount}") if \
+                (amount >= 0) else Label(self.record_frame, text=f"Withdrawal: ${abs(amount)}")
+            date_label = Label(self.record_frame, text=f"{date}", bg='grey')
 
             if date not in date_exists:
                 date_exists[date] = True
@@ -91,7 +92,7 @@ class BANK_MANAGEMENT:
                 amount_label.pack()
             amount_label.pack()
 
-        self.frame3.grid(row=2)
+        self.record_frame.pack()
 
     def deposit_ui(self):
         # this function creates a top level tk window and prompts user to desposit
@@ -222,6 +223,9 @@ class BANK_MANAGEMENT:
             self.user = db.findById(self.user_id).to_dict()
             self.balance = self.user['balance'][0]
             self.balance_label.config(text=f"Balance: ${self.balance}")
+            self.record_frame.destroy()
+            self.create_record_ui()
+            self.frame3.update()
             self.transfer_window.destroy()
             return
         messagebox.showwarning(title="Transfer failed",
@@ -240,6 +244,10 @@ class BANK_MANAGEMENT:
             messagebox.showwarning(title="Amount error",
                                    message="Please enter a number.")
             return
+        if amount > self.balance:
+            messagebox.showwarning(title="Amount error",
+                                   message="insufficient funds.")
+            return
 
         # connect to database
         db = database.DATABASE()
@@ -252,6 +260,9 @@ class BANK_MANAGEMENT:
             self.user = db.findById(self.user_id).to_dict()
             self.balance = self.user['balance'][0]
             self.balance_label.config(text=f"Balance: ${self.balance}")
+            self.record_frame.destroy()
+            self.create_record_ui()
+            self.frame3.update()
             self.withdraw_window.destroy()
             return
         messagebox.showwarning(title="Withdrawal failed",
@@ -281,6 +292,9 @@ class BANK_MANAGEMENT:
             self.user = db.findById(self.user_id).to_dict()
             self.balance = self.user['balance'][0]
             self.balance_label.config(text=f"Balance: ${self.balance}")
+            self.record_frame.destroy()
+            self.create_record_ui()
+            self.frame3.update()
             self.deposit_window.destroy()
             return
 
@@ -291,8 +305,8 @@ class BANK_MANAGEMENT:
         self.root.mainloop()
 
 
-main_win = BANK_MANAGEMENT(1002)
-# main_win = BANK_MANAGEMENT(login_page.user_id)
+# main_win = BANK_MANAGEMENT(1002)
+main_win = BANK_MANAGEMENT(login_page.user_id)
 main_win.mainloop_root()
 
 

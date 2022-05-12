@@ -106,7 +106,7 @@ class DATABASE:
 # SELECT *, tf.dt FROM accounts as a
 # INNER JOIN transactions as t ON a.id = t.account_id
 # INNER JOIN transfers as tf ON a.id = tf.from_account
-# WHERE NOT EXISTS (SELECT * FROM transfers WHERE dt = tf.dt)
+# where a.id = 1002
 # """))
 # print(db.query('SELECT * FROM transfers where from_account = 1002'))
 # print(db.query('SELECT * FROM transfers'))
