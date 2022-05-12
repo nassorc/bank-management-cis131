@@ -4,7 +4,9 @@ from tkinter import ttk
 from sympy import EX
 import database
 from decimal import Decimal
+import pandas as pd
 from authentication_gui_and_program import *
+import datetime
 
 # login_page = Login()
 # login_page.mainloop_window()
@@ -63,30 +65,31 @@ class BANK_MANAGEMENT:
                               width=18, command=self.transfer_ui)
         transfer_btn.grid(row=0, column=2)
 
-        activity_btn = Button(frame2, text="activity", width=18)
+        activity_btn = Button(frame2, text="Logout",
+                              width=18, command=lambda: self.root.quit())
         activity_btn.grid(row=0, column=3)
 
-        # fill="both", expand="yes"
         self.frame3 = Frame(root, width=520, height=40, padx=10, pady=10)
-        frame3_canvas = Canvas(self.frame3)
-        frame3_canvas.pack(side=LEFT, fill=BOTH, expand=1)
+        all_transactions = db.query(f"""SELECT account_id, amount, dt from transactions
+                                        WHERE account_id = {self.user_id} ORDER BY dt DESC""").to_dict()
+        all_transfers = db.query(
+            f"""SELECT from_account, to_account, dt, amount as transfer_amount FROM transfers
+                WHERE from_account = {self.user_id} ORDER BY dt DESC""").to_dict()
+        # history = {**all_transactions, **all_transfers}
+        # print(history)
+        date_exists = {}
+        for i in range(len(all_transactions['account_id'])):
+            amount = all_transactions['amount'][i]
+            date = all_transactions['dt'][i].split()[0]
+            amount_label = Label(self.frame3, text=f"Deposit: ${amount}") if \
+                (amount >= 0) else Label(self.frame3, text=f"Withdrawal: ${abs(amount)}")
+            date_label = Label(self.frame3, text=f"{date}", bg='grey')
 
-        scrolly = Scrollbar(self.frame3, orient=VERTICAL,
-                            command=frame3_canvas.yview)
-        scrolly.pack(side=RIGHT, fill=Y)
-
-        frame3_canvas.configure(yscrollcommand=scrolly.set)
-
-        frame3_innerframe = Frame(self.frame3)
-        frame3_canvas.create_window(
-            (0, 0), window=frame3_innerframe, anchor="nw")
-
-        frame3_canvas.bind('<Configure>', lambda e: frame3_canvas.configure(
-            scrollregion=frame3_canvas.bbox('all')))
-
-        for i in range(20):
-            l = Label(frame3_canvas, text="hello")
-            l.pack()
+            if date not in date_exists:
+                date_exists[date] = True
+                date_label.pack()
+                amount_label.pack()
+            amount_label.pack()
 
         self.frame3.grid(row=2)
 
@@ -186,7 +189,14 @@ class BANK_MANAGEMENT:
             messagebox.showwarning(title="Amount error",
                                    message="Please enter a number.")
             return
-
+        if amount > self.balance:
+            messagebox.showwarning(title="Amount error",
+                                   message="insufficient funds.")
+            return
+        if amount <= 0:
+            messagebox.showwarning(title="Amount error",
+                                   message="Amount must be greater than 0.")
+            return
         # connect to db
         db = database.DATABASE()
         user = db.findByEmail(self.transfer_to_email.get())
@@ -197,15 +207,25 @@ class BANK_MANAGEMENT:
             return
 
         receiver_id = user.to_dict()['id'][0]
-        res = db.depositToAccount(receiver_id, amount)
-        if res:
+
+        # desposit to receiver
+        res = db.deposit_to_Account(receiver_id, amount)
+
+        # withdraw from sender
+        withdraw_from_sender = db.withdraw_from_Account(
+            self.user_id, Decimal(f'-{amount}'))
+
+        if res and withdraw_from_sender:
             db.add_transfer_record(receiver_id, self.user_id, amount)
             messagebox.showinfo(title="Success",
                                 message="The money has been sent")
+            self.user = db.findById(self.user_id).to_dict()
+            self.balance = self.user['balance'][0]
+            self.balance_label.config(text=f"Balance: ${self.balance}")
             self.transfer_window.destroy()
             return
-
-        # check if account exists
+        messagebox.showwarning(title="Transfer failed",
+                               message="Transfer failed")
 
     def make_withdrawal(self):
         # this function validates the amount to be taken out of the
@@ -223,8 +243,7 @@ class BANK_MANAGEMENT:
 
         # connect to database
         db = database.DATABASE()
-        res = db.depositToAccount(self.user_id, amount)
-        db.add_transaction_record(self.user_id, amount)
+        res = db.withdraw_from_Account(self.user_id, amount)
 
         # check if data is saved to the database
         if res:
@@ -235,15 +254,13 @@ class BANK_MANAGEMENT:
             self.balance_label.config(text=f"Balance: ${self.balance}")
             self.withdraw_window.destroy()
             return
+        messagebox.showwarning(title="Withdrawal failed",
+                               message="Withdrawal failed")
 
     def make_deposit(self):
         if not self.amount_entry.get():
             messagebox.showwarning(title="Amount error",
                                    message="Input cannot be empty")
-            return
-        if self.amount_entry.get() <= 0:
-            messagebox.showwarning(title="Amount error",
-                                   message="Amount must be greater than 0.")
             return
         try:
             amount = Decimal(self.amount_entry.get())
@@ -251,11 +268,14 @@ class BANK_MANAGEMENT:
             messagebox.showwarning(title="Amount error",
                                    message="Please enter a number.")
             return
+        if amount <= 0:
+            messagebox.showwarning(title="Amount error",
+                                   message="Amount must be greater than 0.")
+            return
 
         db = database.DATABASE()
-        res = db.depositToAccount(self.user_id, amount)
+        res = db.deposit_to_Account(self.user_id, amount)
         if res:
-            db.add_transaction_record(self.user_id, amount)
             messagebox.showinfo(title="Success",
                                 message="Amount has been deposited.")
             self.user = db.findById(self.user_id).to_dict()
@@ -263,6 +283,9 @@ class BANK_MANAGEMENT:
             self.balance_label.config(text=f"Balance: ${self.balance}")
             self.deposit_window.destroy()
             return
+
+        messagebox.showwarning(title="Deposit failed",
+                               message="Deposit failed")
 
     def mainloop_root(self):
         self.root.mainloop()

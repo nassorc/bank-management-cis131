@@ -68,17 +68,32 @@ class DATABASE:
         # finds a user given an id
         return pd.read_sql(f"SELECT * FROM accounts WHERE id={id}", self.connection)
 
-    def depositToAccount(self, id, amount):
+    def deposit_to_Account(self, id, amount):
         # function deposits an amount into a given users record
         try:
             cursor = self.connection.cursor()
-            cursor.execute(f"""UPDATE accounts SET balance = balance + {int(amount)}
+            cursor.execute(f"""UPDATE accounts SET balance = balance + {amount}
                                 WHERE id = {id};""")
         except Exception as e:
             print(f"Error: depositToAccount failed.\n--{e}")
             return False
 
         self.connection.commit()
+        self.add_transaction_record(id, amount)
+        return True
+
+    def withdraw_from_Account(self, id, amount):
+        # function deposits an amount into a given users record
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(f"""UPDATE accounts SET balance = balance + {amount}
+                                WHERE id = {id};""")
+        except Exception as e:
+            print(f"Error: depositToAccount failed.\n--{e}")
+            return False
+
+        self.connection.commit()
+        self.add_transaction_record(id, amount)
         return True
 
     def closeDatabase(self):
@@ -87,7 +102,13 @@ class DATABASE:
 
 
 # db = DATABASE()
-# print(db.query('SELECT * FROM accounts'))
+# print(db.query("""
+# SELECT *, tf.dt FROM accounts as a
+# INNER JOIN transactions as t ON a.id = t.account_id
+# INNER JOIN transfers as tf ON a.id = tf.from_account
+# WHERE NOT EXISTS (SELECT * FROM transfers WHERE dt = tf.dt)
+# """))
+# print(db.query('SELECT * FROM transfers where from_account = 1002'))
+# print(db.query('SELECT * FROM transfers'))
 # db.add_account('matty', 'cross', 'matty@gmail.com', '321'.encode('ASCII'))
-# print(db.query('SELECT * FROM transactions INNER JOIN accounts as a ON transactions.account_id=a.id'))
 # print(db.query("""SELECT * FROM transfers"""))
