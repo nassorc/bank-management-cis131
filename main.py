@@ -69,30 +69,37 @@ class BANK_MANAGEMENT:
                               width=18, command=lambda: self.root.quit())
         activity_btn.grid(row=0, column=3)
 
-        self.frame3 = Frame(root, width=520, height=40, padx=10, pady=10)
+        self.frame3 = Frame(root, width=520, height=40,
+                            padx=20, pady=10)
         self.create_record_ui()
-        self.frame3.grid(row=2)
+        self.frame3.grid(row=2, columnspan=2, sticky=E+W)
 
     def create_record_ui(self):
-        self.record_frame = Frame(self.frame3)
+        self.record_frame = Frame(
+            self.frame3, width=500, height=100)
         db = database.DATABASE()
         all_transactions = db.query(f"""SELECT account_id, amount, dt from transactions
                                         WHERE account_id = {self.user_id} ORDER BY dt DESC""").to_dict()
         date_exists = {}
+        row_count = 0
         for i in range(len(all_transactions['account_id'])):
             amount = all_transactions['amount'][i]
             date = all_transactions['dt'][i].split()[0]
-            amount_label = Label(self.record_frame, text=f"Deposit: ${amount}") if \
-                (amount >= 0) else Label(self.record_frame, text=f"Withdrawal: ${abs(amount)}")
-            date_label = Label(self.record_frame, text=f"{date}", bg='grey')
+            amount_label = Label(self.record_frame, text=f"Deposit: ${amount}", width=50, anchor=W) if \
+                (amount >= 0) else Label(self.record_frame, text=f"Withdrawal: ${abs(amount)}", width=50, anchor=W)
+            date_label = Label(
+                self.record_frame, text=f"{date}", width=50, anchor=W, bg='grey')
 
             if date not in date_exists:
                 date_exists[date] = True
-                date_label.pack()
-                amount_label.pack()
-            amount_label.pack()
+                date_label.grid(row=row_count, columnspan=2, sticky=E+W)
+                row_count += 1
+                amount_label.grid(row=row_count)
+                row_count += 1
+            amount_label.grid(row=row_count)
+            row_count += 1
 
-        self.record_frame.pack()
+        self.record_frame.grid(row=0, column=0, columnspan=2, sticky=E+W)
 
     def deposit_ui(self):
         # this function creates a top level tk window and prompts user to desposit
@@ -102,19 +109,22 @@ class BANK_MANAGEMENT:
         self.deposit_window.title('Deposit')
 
         # frame holds all widgets
-        ui_frame = Frame(self.deposit_window)
+        ui_frame = Frame(self.deposit_window, pady=20)
 
         balance_label = Label(ui_frame,
-                              text=f"${self.balance}", font=(42))
-        amount_label = Label(ui_frame, text="Amount $")
+                              text=f"${self.balance}", font=(42), pady=10)
+        amount_label = Label(ui_frame, text="Amount $", pady=20)
+        desposit_label = Label(ui_frame, text="Deposit", anchor=W, font=(48))
         self.amount_entry = Entry(ui_frame)
-        button = Button(ui_frame, text="send", command=self.make_deposit)
+        button = Button(ui_frame, text="send",
+                        command=self.make_deposit)
 
         # display in frame
         balance_label.grid(row=0, column=0, columnspan=2)
-        amount_label.grid(row=1, column=0, sticky=W)
-        self.amount_entry.grid(row=1, column=1)
-        button.grid(row=2, columnspan=2)
+        desposit_label.grid(row=1, column=0)
+        amount_label.grid(row=2, column=0, sticky=W)
+        self.amount_entry.grid(row=2, column=1)
+        button.grid(row=3, columnspan=2, sticky=E+W)
 
         # display frame
         ui_frame.pack()
@@ -130,19 +140,23 @@ class BANK_MANAGEMENT:
 
         # holds all widgets
         # justify widgets center
-        widget_container = Frame(self.withdraw_window)
+        widget_container = Frame(self.withdraw_window, pady=20)
 
         balance_label = Label(widget_container,
-                              text=f"${self.balance}", font=(42))
-        amount_label = Label(widget_container, text="Amount $")
+                              text=f"${self.balance}", font=(42), pady=10)
+        amount_label = Label(widget_container, text="Amount $", pady=20)
+        withdraw_label = Label(
+            widget_container, text="Withdraw", anchor=W, font=(48))
+
         self.amount_entry = Entry(widget_container)
         button = Button(widget_container, text="send",
                         command=self.make_withdrawal)
 
         balance_label.grid(row=0, column=0, columnspan=2)
-        amount_label.grid(row=1, column=0, sticky=W)
-        self.amount_entry.grid(row=1, column=1)
-        button.grid(row=2, columnspan=2)
+        withdraw_label.grid(row=1, column=0)
+        amount_label.grid(row=2, column=0, sticky=W)
+        self.amount_entry.grid(row=2, column=1)
+        button.grid(row=3, columnspan=2, sticky=E+W)
 
         widget_container.pack()
 
@@ -151,14 +165,16 @@ class BANK_MANAGEMENT:
         self.transfer_window.geometry("410x300")
         self.transfer_window.title('Transfer money')
 
-        widget_container = Frame(self.transfer_window)
+        widget_container = Frame(self.transfer_window, pady=20)
 
         # labels
-        header_label = Label(widget_container, text="Transfer money")
-        from_label = Label(widget_container, text="From: ")
+        header_label = Label(
+            widget_container, text="Transfer", font=(42), pady=10)
+        amount_label = Label(widget_container, text="Amount $", pady=20)
+        from_label = Label(widget_container, text="From: ", pady=5)
         from_label_user = Label(
-            widget_container, text=f"{self.email}", relief=SUNKEN)
-        to_label = Label(widget_container, text="To: ")
+            widget_container, text=f"{self.email}", relief=SUNKEN, padx=9)
+        to_label = Label(widget_container, text="To: ", pady=5)
 
         # entry
         self.amount = Entry(widget_container)
@@ -170,11 +186,12 @@ class BANK_MANAGEMENT:
 
         # place on screen
         header_label.grid(row=0, column=0, columnspan=2)
-        self.amount.grid(row=1, column=0, columnspan=2)
-        from_label.grid(row=2, column=0, columnspan=2)
-        from_label_user.grid(row=2, column=1, columnspan=2)
-        to_label.grid(row=3, column=0, columnspan=2)
-        self.transfer_to_email.grid(row=3, column=1, columnspan=2)
+        amount_label.grid(row=1, column=0, sticky=W)
+        self.amount.grid(row=1, column=1)
+        from_label.grid(row=2, column=0, sticky=W)
+        from_label_user.grid(row=2, column=1)
+        to_label.grid(row=3, column=0, sticky=W)
+        self.transfer_to_email.grid(row=3, column=1)
         transfer_button.grid(row=4, column=0, columnspan=2)
 
         widget_container.pack()
@@ -244,7 +261,7 @@ class BANK_MANAGEMENT:
             messagebox.showwarning(title="Amount error",
                                    message="Please enter a number.")
             return
-        if amount > self.balance:
+        if abs(amount) > self.balance:
             messagebox.showwarning(title="Amount error",
                                    message="insufficient funds.")
             return
@@ -305,7 +322,7 @@ class BANK_MANAGEMENT:
         self.root.mainloop()
 
 
-# main_win = BANK_MANAGEMENT(1002)
+# main_win = BANK_MANAGEMENT(1004)
 main_win = BANK_MANAGEMENT(login_page.user_id)
 main_win.mainloop_root()
 

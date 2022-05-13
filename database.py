@@ -102,6 +102,7 @@ class DATABASE:
 
 
 # db = DATABASE()
+# print(db.query("SELECT * FROM accounts"))
 # print(db.query("""
 # SELECT *, tf.dt FROM accounts as a
 # INNER JOIN transactions as t ON a.id = t.account_id
