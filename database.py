@@ -50,6 +50,7 @@ class DATABASE:
         # function creates and inserts a new user into the database
         try:
             cursor = self.connection.cursor()
+            # decodes the password before storing it
             cursor.execute(
                 f"INSERT INTO accounts (email, password, first_name, last_name) VALUES('{email}', '{password.decode('ASCII')}', '{first}', '{last}');")
         except Exception as e:
